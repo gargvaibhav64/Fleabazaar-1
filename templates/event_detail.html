@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+
+<div class="content">
+    <div class="section-inner clearfix">
+
+        <h1>{{ event.name|capfirst }}</h1>
+
+
+        {% for shop in shops %}
+        <p>
+            {{ shop }}
+            {{ shop.price }}
+            <a href="{{ shop.add_to_cart_url}}" class="button" name="add-to-cart"> Add to cart </a>
+            <a href="{{ shop.remove_from_cart_url}}" class="button" name="remove-from-cart"> Remove from cart </a>
+        </p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

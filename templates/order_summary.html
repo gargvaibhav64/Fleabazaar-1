@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="table-responsive">
+    <h2> Order Summary </h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Event Name</th>
+                <th scope="col">Shop Number</th>
+                <th scope="col">Price</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for order_item in object.items.all %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ order_item.item.event.name }}</td>
+                <td>
+                    {{ order_item.item.shop_no }}
+                    <a href="{% url 'core:remove-from-cart' order_item.item.event.pk order_item.item.shop_no %}"><i
+                            class="fas fa-trash ml-2"></i></a>
+                </td>
+                <td>{{ order_item.item.price }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3"><b>Order Total</b></td>
+                <td><b>{{ object.get_total }}</b></td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <a class="btn btn-warning float-right ml-2" href="/checkout">Proceed to Checkout</a>
+                    <a class="btn btn-primary float-right " href="/">Go Back</a>
+
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>
+{% endblock content %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2> LIST OF EVENTS </h2>
+{% for event in object_list %}
+{{ event }}
+{{ event.place }}
+<a href="{{ event.get_absolute_url }}">{{ event|capfirst }}</a>
+
+{% endfor %}
+{% endblock content %}
