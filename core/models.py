@@ -75,6 +75,9 @@ class Order(models.Model):
     address = models.ForeignKey(
         'Address', on_delete=models.SET_NULL, blank=True, null=True)
 
+    payment = models.ForeignKey(
+        'PaymentInfo', on_delete=models.SET_NULL, blank=True, null=True)
+
     def __str__(self):
         return str(self.pk)
 
@@ -100,3 +103,15 @@ class Address(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class PaymentInfo(models.Model):
+    gateway_name = models.CharField(max_length=100, null=True, blank=True)
+    transaction_id = models.CharField(max_length=100, null=True, blank=True)
+    transaction_amount = models.CharField(
+        max_length=100, null=True, blank=True)
+    bank_transaction_id = models.CharField(
+        max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return self.transaction_id

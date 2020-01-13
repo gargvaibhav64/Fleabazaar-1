@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404, reverse, redirect, HttpResponse
-from .models import Event, Shop, OrderItem, Order, Address
+from .models import Event, Shop, OrderItem, Order, Address, PaymentInfo
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, View
 from django.contrib import messages
@@ -9,6 +9,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CheckoutForm
 from django.views.decorators.csrf import csrf_exempt
 from .Paytm import Checksum
+import json
+import requests
 # Create your views here.
 
 MERCHANT_ID = 'yGhiFc56070841982837'
@@ -171,8 +173,41 @@ def handlerequest(request):
     verify = Checksum.verify_checksum(response_dict, MERCHANT_KEY, checksum)
     if verify:
         if response_dict['RESPCODE'] == '01':
+            # verify with transaction-status-api
+            paytmParams = dict()
+            paytmParams["MID"] = MERCHANT_ID
+            print(response_dict)
+            paytmParams["ORDERID"] = response_dict["ORDERID"]
+            checksum = Checksum.generate_checksum(paytmParams, MERCHANT_KEY)
+            paytmParams["CHECKSUMHASH"] = checksum
+            post_data = json.dumps(paytmParams)
+            url = "https://securegw-stage.paytm.in/order/status"
+            response_from_api = requests.post(url, data=post_data, headers={
+                                              "Content-type": "application/json"}).json()
+
+            if response_from_api['RESPCODE'] == '01':
+                try:
+                    orders = Order.objects.filter(
+                        pk=response_dict["ORDERID"])[0]
+                    orders.ordered = True
+                    orders.ordered_date = timezone.now()
+                    payment = PaymentInfo()
+                    payment.gateway_name = response_dict['GATEWAYNAME']
+                    payment.transaction_id = response_dict['TXNID']
+                    payment.bank_transaction_id = response_dict['BANKTXNID']
+                    payment.transaction_amount = response_dict['TXNAMOUNT']
+                    payment.save()
+
+                    orders.payment = payment
+                    orders.save()
+                except ObjectDoesNotExist:
+                    messages.error(request, "Order not found")
+
+                print('Payment received')
+
             print('order successful')
         else:
+            print(response_dict)
             print('order was not successful because' +
                   response_dict['RESPMSG'])
     return render(request, 'paymentstatus.html', {'response': response_dict})

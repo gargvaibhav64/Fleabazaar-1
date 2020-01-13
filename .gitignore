@@ -1,6 +1,7 @@
 env
 **/*.pyc
 **/__pycache__
+**/migrations
 media
 .DS_Store
 *.sqlite3
