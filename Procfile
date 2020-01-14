@@ -1,1 +1,1 @@
-web: gunicorn fleabazaar.wsgi
+web: gunicorn fleabazaar.wsgi --log-file -
