@@ -9,12 +9,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CheckoutForm
 from django.views.decorators.csrf import csrf_exempt
 from .Paytm import Checksum
+from fleabazaar.settings import MERCHANT_ID, MERCHANT_KEY
 import json
 import requests
 # Create your views here.
-
-MERCHANT_ID = 'yGhiFc56070841982837'
-MERCHANT_KEY = 'Be7uTRD@7R9QOGN3'
 
 
 def event_list(request):
